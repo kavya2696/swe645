@@ -1,3 +1,8 @@
+#1. Kavya Shivakumar (G01520934)
+#2. Sehaj Gill (G01535820)
+#3. Jaanaki Swaroop P(G01502869)
+#4. Koushik Vasa (G01480627)
+
 from flask import Flask, request, Response
 from flask_sqlalchemy import SQLAlchemy
 from collections import OrderedDict
@@ -11,6 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Defining the Survey
 class Survey(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
@@ -27,6 +33,7 @@ class Survey(db.Model):
     recommendation = db.Column(db.String(50), nullable=True)
     comments = db.Column(db.String(255), nullable=True)
 
+    # Converting object to dictionary
     def to_dict(self):
         return OrderedDict([
             ("first_name", self.first_name),
@@ -44,6 +51,7 @@ class Survey(db.Model):
             ("comments", self.comments)
         ])
 
+#to create new survey
 @app.route('/survey', methods=['POST'])
 def create_survey():
     data = request.json
@@ -69,17 +77,20 @@ def create_survey():
         'survey': survey.to_dict()
     }), mimetype='application/json', status=201)
 
+#to retrieve survey
 @app.route('/survey', methods=['GET'])
 def get_all_surveys():
     surveys = Survey.query.all()
     ordered_data = [s.to_dict() for s in surveys]
     return Response(json.dumps(ordered_data), mimetype='application/json')
 
+#to retrieve by specific survey by ID
 @app.route('/survey/<int:id>', methods=['GET'])
 def get_survey(id):
     survey = Survey.query.get_or_404(id)
     return Response(json.dumps(survey.to_dict()), mimetype='application/json')
 
+#to update the existing survey
 @app.route('/survey/<int:id>', methods=['PUT'])
 def update_survey(id):
     data = request.json
@@ -93,6 +104,7 @@ def update_survey(id):
         'survey': survey.to_dict()
     }), mimetype='application/json')
 
+#to delete the survey
 @app.route('/survey/<int:id>', methods=['DELETE'])
 def delete_survey(id):
     survey = Survey.query.get_or_404(id)
@@ -101,5 +113,6 @@ def delete_survey(id):
     return Response(json.dumps({'message': 'Survey deleted'}), mimetype='application/json')
 
 if __name__ == '__main__':
+    #to run the app
     app.run(host='0.0.0.0', port=5000, debug=True)
 
